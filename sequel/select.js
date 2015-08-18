@@ -55,6 +55,11 @@ SelectBuilder.prototype.buildSimpleSelect = function buildSimpleSelect(queryObje
     return aggregations;
   }
 
+  // Escape any schema
+  var schemaName = self.schema[self.currentTable].schemaName || '';
+  schemaName = utils.escapeName(schemaName, self.escapeCharacter);
+  schemaName = (schemaName.length > 0) ? schemaName + '.' : '';
+
   // Escape table name
   var tableName = utils.escapeName(self.schema[self.currentTable].tableName, self.escapeCharacter);
 
@@ -105,7 +110,7 @@ SelectBuilder.prototype.buildSimpleSelect = function buildSimpleSelect(queryObje
   });
 
   // Remove the last comma
-  query = query.slice(0, -2) + ' FROM ' + tableName + ' AS ' + utils.escapeName(self.currentTable, self.escapeCharacter) + ' ';
+  query = query.slice(0, -2) + ' FROM ' + schemaName + tableName + ' AS ' + utils.escapeName(self.currentTable, self.escapeCharacter) + ' ';
 
   return query;
 };
@@ -214,7 +219,12 @@ SelectBuilder.prototype.processAggregates = function processAggregates(criteria)
   // trim trailing comma
   query = query.slice(0, -2) + ' ';
 
+  // Escape any schema
+  var schemaName = self.schema[self.currentTable].schemaName || '';
+  schemaName = utils.escapeName(schemaName, self.escapeCharacter);
+  schemaName = (schemaName.length > 0) ? schemaName + '.' : '';
+
   // Add FROM clause
-  query += 'FROM ' + utils.escapeName(self.schema[self.currentTable].tableName, self.escapeCharacter) + ' AS ' + tableName + ' ';
+  query += 'FROM ' + schemaName + utils.escapeName(self.schema[self.currentTable].tableName, self.escapeCharacter) + ' AS ' + tableName + ' ';
   return query;
 };
